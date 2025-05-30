@@ -1,5 +1,6 @@
 import React from 'react';
+import Signup from '../../Components/SignUp';
 
 export default function Login() {
-  return <h2>Login Page</h2>;
+  return <Signup />; // Render the Signup component directly
 }

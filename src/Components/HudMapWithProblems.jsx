@@ -9,6 +9,9 @@ import {
   useMapEvents,
 } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import { useDispatch, useSelector } from 'react-redux';
+import RequirementForm from './RequirementsForm';
+import { submitProblem } from '../features/counter/ProblemSlice'; // Ensure this is correctly imported
 
 const API_URL = 'http://localhost:8080/api/define/create/problem';
 const HARDCODED_USER_ID = 'demo-user-123';
@@ -40,18 +43,20 @@ const HudMapWithProblems = () => {
   const [circleCoords, setCircleCoords] = useState(null);
   const [selectedLevel, setSelectedLevel] = useState('');
   const [selectedPestle, setSelectedPestle] = useState([]);
-  const [zoomLevel, setZoomLevel] = useState(13);
+  const [zoomLevel] = useState(13);
   const [problems, setProblems] = useState([]);
 
   const [newProblemCoords, setNewProblemCoords] = useState(null);
   const [newProblemData, setNewProblemData] = useState({
     title: '',
     statement: '',
-   
     level: '',
     pestle: [],
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const createdProblemId = useSelector((state) => state.problem.createdProblemId);
+  const dispatch = useDispatch();
 
   const handleSearch = async () => {
     try {
@@ -109,38 +114,23 @@ const HudMapWithProblems = () => {
 
     const payload = {
       ...newProblemData,
-      pestle: newProblemData.pestle.join(','), // send as comma-separated string
-      level: newProblemData.level,
       location: newProblemCoords.join(','),
-      created_by_user_id: HARDCODED_USER_ID,
+      pestle: [...newProblemData.pestle],
     };
-
-    console.log('Sending payload:', payload);
 
     try {
       setIsSubmitting(true);
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-User-Id': HARDCODED_USER_ID,
-        },
-        body: JSON.stringify(payload),
-      });
+      await dispatch(submitProblem({ data: payload, userId: HARDCODED_USER_ID })).unwrap();
 
-      const responseText = await response.text();
-      console.log('Server response:', response.status, responseText);
-
-      if (!response.ok) throw new Error('Problem creation failed');
-
-      // convert pestle back to array before saving to state
+      // Add to local problems list for map marker display
       setProblems((prev) => [
         ...prev,
         {
           ...payload,
-          id: Date.now(),
+          id: createdProblemId, // retrieved from Redux
           coordinates: newProblemCoords,
-          pestle: payload.pestle.split(','),
+          pestle: payload.pestle,
+          requirements: [],
         },
       ]);
 
@@ -186,7 +176,16 @@ const HudMapWithProblems = () => {
             <Popup>
               <strong>{p.title}</strong><br />
               {p.statement || p.description}<br />
-              <em>{p.level || 'n/a'} | {(p.pestle || []).join(', ')}</em>
+              <em>{p.level || 'n/a'} | {(p.pestle || []).join(', ')}</em><br />
+              {p.requirements?.length > 0 && (
+                <>
+                  <hr />
+                  <strong>Requirements:</strong>
+                  <ul>
+                    {p.requirements.map((r, i) => <li key={i}>{r}</li>)}
+                  </ul>
+                </>
+              )}
             </Popup>
           </Marker>
         ))}
@@ -256,7 +255,6 @@ const HudMapWithProblems = () => {
               onChange={(e) => setNewProblemData({ ...newProblemData, statement: e.target.value })}
               style={{ ...styles.input, height: '80px' }}
             />
-
             <select
               value={newProblemData.level}
               onChange={(e) => setNewProblemData({ ...newProblemData, level: e.target.value })}
@@ -267,7 +265,6 @@ const HudMapWithProblems = () => {
                 <option key={lvl} value={lvl}>{lvl}</option>
               ))}
             </select>
-
             <div style={styles.tags}>
               {PESTLE_SUGGESTIONS.map((tag) => (
                 <button
@@ -283,11 +280,25 @@ const HudMapWithProblems = () => {
                 </button>
               ))}
             </div>
-
             <button onClick={handleSubmit} disabled={isSubmitting} style={styles.button}>
               {isSubmitting ? 'Submitting...' : 'Submit Problem'}
             </button>
           </div>
+        )}
+
+        {createdProblemId && (
+          <RequirementForm
+            problemId={createdProblemId}
+            onRequirementAdded={(reqText) => {
+              setProblems((prev) =>
+                prev.map((p) =>
+                  p.id === createdProblemId
+                    ? { ...p, requirements: [...(p.requirements || []), reqText] }
+                    : p
+                )
+              );
+            }}
+          />
         )}
       </div>
     </div>
@@ -295,19 +306,33 @@ const HudMapWithProblems = () => {
 };
 
 const styles = {
-  wrapper: { height: '100vh', width: '100vw', position: 'relative' },
-  map: { height: '100%', width: '100%' },
+  wrapper: {
+    height: '100vh',
+    width: '100vw',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    gap: '2rem',
+    padding: '2rem',
+    boxSizing: 'border-box'
+  },
+  map: {
+    height: '100%',
+    width: '50vw',
+    borderRadius: '8px',
+    boxShadow: '0 0 10px rgba(0,0,0,0.1)'
+  },
   hud: {
-    position: 'absolute',
-    top: '10px',
-    left: '10px',
+    flex: '1',
+    maxWidth: '400px',
     background: '#fff',
     padding: '1rem',
     borderRadius: '8px',
     zIndex: 1000,
-    maxWidth: '320px',
     boxShadow: '0 0 10px rgba(0,0,0,0.1)',
-    fontFamily: 'sans-serif'
+    fontFamily: 'sans-serif',
+    overflowY: 'auto',
+    maxHeight: 'calc(100vh - 4rem)'
   },
   input: {
     width: '100%', padding: '0.5rem', fontSize: '1rem',

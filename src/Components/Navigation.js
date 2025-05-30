@@ -17,6 +17,18 @@ function Navigation() {
         <li>
           <Link to="/Sandbox" className="text-white hover:text-yellow-400 transition">Sandbox</Link>
         </li>
+
+                <li>
+          <Link to="/MainActor" className="text-white hover:text-yellow-400 transition">ProblemsDash</Link>
+        </li>
+
+                        <li>
+          <Link to="/CreateProblem" className="text-white hover:text-yellow-400 transition">CreateProblem</Link>
+        </li>
+
+
+
+
       </ul>
     </nav>
   );

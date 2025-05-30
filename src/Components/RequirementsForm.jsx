@@ -4,15 +4,16 @@ import {
   addRequirement,
   clearRequirements,
   submitRequirements,
-} from '../store/problemSlice';
+} from '../features/counter/ProblemSlice';
 
 const RequirementForm = () => {
   const [input, setInput] = useState('');
   const dispatch = useDispatch();
 
-  const requirements = useSelector((state) => state.problem.pendingRequirements);
-  const problemId = useSelector((state) => state.problem.createdProblemId);
-  const userId = useSelector((state) => state.user.id); // assumes user slice
+  // Safely accessing Redux state
+  const requirements = useSelector((state) => state.problem?.pendingRequirements || []);
+  const problemId = useSelector((state) => state.problem?.createdProblemId);
+  const userId = useSelector((state) => state.user?.id || 'demo-user-123');
 
   const handleAdd = () => {
     if (input.trim() === '') return;
@@ -26,6 +27,10 @@ const RequirementForm = () => {
     dispatch(clearRequirements());
     alert('Requirements submitted!');
   };
+
+  // Debug log to confirm Redux connection
+  const state = useSelector((s) => s);
+  console.log('🔍 Redux state:', state);
 
   return (
     <div style={styles.container}>

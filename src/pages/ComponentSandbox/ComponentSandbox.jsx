@@ -1,21 +1,15 @@
 import React from 'react';
 import ProblemRequirementBox from '../../Components/ProblemRequirementBox';
+
+import MiniMap from '../../Components/MiniMap';
+
+
 const ComponentSandbox = () => {
-  // Example props for testing
-  const problemFields = [
-    { label: 'Title', value: 'Plastic Pollution' },
-    { label: 'Impact', value: 'Affects marine life and ecosystem.' },
-  ];
-
-  const requirementFields = [
-    { label: 'Proposed Solution', value: 'Ban single-use plastics' },
-    { label: 'Urgency', value: 'Critical' },
-  ];
-
+  
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div>
     
-
+      <MiniMap/>
       
     </div>
   );
