@@ -25,6 +25,19 @@ function Navigation() {
                         <li>
           <Link to="/CreateProblem" className="text-white hover:text-yellow-400 transition">CreateProblem</Link>
         </li>
+        
+                                <li>
+          <Link to="/ProblemSearch" className="text-white hover:text-yellow-400 transition">ProblemSearch</Link>
+        </li>
+
+                                        <li>
+          <Link to="/ProblemView" className="text-white hover:text-yellow-400 transition">ProblemView</Link>
+        </li>
+                                                <li>
+          <Link to="/IndiProblemView" className="text-white hover:text-yellow-400 transition">IndiProblemView</Link>
+        </li>
+
+
 
 
 

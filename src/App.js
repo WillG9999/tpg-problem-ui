@@ -7,6 +7,9 @@ import ComponentSandbox from './pages/ComponentSandbox/ComponentSandbox';
 import ProblemsDash from './pages/ProblemsDash/ProblemsDash';
 import CreateProblem from './pages/CreateProblem/CreateProblem';
 import Layout from './Components/Layout';
+import ProblemSearch from './pages/ProblemSearch/ProblemSearch';
+import ProblemView from './pages/ProblemView/ProblemView'; // Ensure this import is correct
+import IndiProblemView from './pages/IndiProblemView/IndiProblemView'; // Ensure this import is correct
 
 function App() {
   return (
@@ -20,6 +23,13 @@ function App() {
           <Route path="/sandbox" element={<ComponentSandbox />} />
           <Route path="/MainActor" element={<ProblemsDash />} />
           <Route path="/CreateProblem" element={<CreateProblem />} />
+          <Route path="/ProblemSearch" element={<ProblemSearch />} />
+          <Route path="/ProblemView" element={<ProblemView />} />
+          <Route path="/IndiProblemView" element={<IndiProblemView />} />
+
+
+          
+
         </Route>
 
         {/* Optional: standalone routes without layout */}
